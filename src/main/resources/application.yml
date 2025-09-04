@@ -1,1 +1,3 @@
-spring.application.name=meow-chatting
+spring:
+  profiles:
+    active: local
