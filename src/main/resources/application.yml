@@ -1,1 +1,4 @@
-spring.application.name=meow-chatting
+jwt:
+  secret-key: secretKeyqwd2212MeowSecretKeyAasdasdasda
+  expiration: 86400
+  refresh.expiration: 86400
