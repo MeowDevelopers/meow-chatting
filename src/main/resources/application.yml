@@ -1,3 +1,6 @@
+spring:
+  profiles:
+    active: local
 jwt:
   secret-key: ${JWT_SECRET}
   access.expiration: 21600
