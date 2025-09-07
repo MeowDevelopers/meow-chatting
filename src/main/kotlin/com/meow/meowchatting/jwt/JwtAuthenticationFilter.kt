@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 
@@ -17,12 +18,15 @@ class JwtAuthenticationFilter (
         val header = req.getHeader("Authorization")
         val token = if (header?.startsWith("Bearer ") == true) header.substring(7) else null
 
-        if (token != null && jwtProvider.validateToken(token) && SecurityContextHolder.getContext().authentication == null) {
-            val username = jwtProvider.getUsername(token)
+        if (token != null
+                && jwtProvider.validateToken(token)
+                && SecurityContextHolder.getContext().authentication == null
+            ) {
+            val userName = jwtProvider.getUsername(token)
             val authorities = jwtProvider.getAuthorities(token)
             
-            val userDetails = org.springframework.security.core.userdetails.User(
-                username,
+            val userDetails = User(
+                userName,
                 "",
                 authorities
             )

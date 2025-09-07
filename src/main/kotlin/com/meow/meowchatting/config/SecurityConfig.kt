@@ -25,30 +25,6 @@ class SecurityConfig(
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
-    // ✅ 인메모리 유저 등록 (테스트용)
-    @Bean
-    fun userDetailsService(passwordEncoder: PasswordEncoder): UserDetailsService {
-        val user = User.withUsername("user1")
-            .password(passwordEncoder.encode("pass1234"))
-            .roles("USER")
-            .build()
-        val admin = User.withUsername("admin1")
-            .password(passwordEncoder.encode("admin1234"))
-            .roles("ADMIN")
-            .build()
-        return InMemoryUserDetailsManager(user, admin)
-    }
-
-    @Bean
-    fun authenticationProvider(
-        uds: UserDetailsService,
-        encoder: PasswordEncoder
-    ): DaoAuthenticationProvider =
-        DaoAuthenticationProvider().apply {
-            setUserDetailsService(uds)
-            setPasswordEncoder(encoder)
-        }
-
     @Bean
     fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager =
         config.authenticationManager
@@ -62,10 +38,8 @@ class SecurityConfig(
                 it.requestMatchers("/api/login").permitAll()
                     .anyRequest().authenticated()
             }
-            .authenticationProvider(authenticationProvider(userDetailsService(passwordEncoder()), passwordEncoder()))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
-
 }

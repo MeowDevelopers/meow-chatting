@@ -1,4 +1,4 @@
 jwt:
-  secret-key: secretKeyqwd2212MeowSecretKeyAasdasdasda
-  expiration: 86400
+  secret-key: ${JWT_SECRET}
+  access.expiration: 21600
   refresh.expiration: 86400
