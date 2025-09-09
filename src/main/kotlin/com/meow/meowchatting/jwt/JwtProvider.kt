@@ -6,7 +6,7 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
-import java.time.Instant
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
@@ -16,30 +16,32 @@ import javax.crypto.SecretKey
 class JwtProvider (
     @Value("\${jwt.secret-key}") private val secret: String,
     @Value("\${jwt.access.expiration}") private val accessExpiration: Long,
-    @Value("\${jwt.refresh.expiration}") private val refreshExpiration: Long
+    @Value("\${jwt.refresh.expiration}") private val refreshExpiration: Duration
 ) {
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
-    private val zone: ZoneId = ZoneId.of("Asia/Seoul")
 
     fun generateToken(username: String, roles: List<Any> = emptyList()): String {
-        val now = Instant.now()
-        val expiresAt  = now.plusSeconds(accessExpiration)
+        val nowLdt = LocalDateTime.now()
+        val expiresAtLdt  = nowLdt.plusSeconds(accessExpiration)
+
+        val now = Date.from(nowLdt.atZone(ZoneId.systemDefault()).toInstant())
+        val expiresAt = Date.from(expiresAtLdt.atZone(ZoneId.systemDefault()).toInstant())
 
         return Jwts.builder()
             .subject(username)
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(expiresAt))
+            .issuedAt(now)
+            .expiration(expiresAt)
             .claim("roles", roles)
             .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }
 
     fun generateRefreshToken(username: String, roles: List<String>): String {
-        val nowLdt = LocalDateTime.now(zone)
-        val expiresAtLdt  = nowLdt.plusSeconds(refreshExpiration)
+        val nowLdt = LocalDateTime.now()
+        val expiresAtLdt  = nowLdt.plus(refreshExpiration)
 
-        val now = Date.from(nowLdt.atZone(zone).toInstant())
-        val expiresAt = Date.from(expiresAtLdt.atZone(zone).toInstant())
+        val now = Date.from(nowLdt.atZone(ZoneId.systemDefault()).toInstant())
+        val expiresAt = Date.from(expiresAtLdt.atZone(ZoneId.systemDefault()).toInstant())
 
         return Jwts.builder()
             .subject(username)
