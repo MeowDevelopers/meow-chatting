@@ -6,12 +6,7 @@ import org.springframework.boot.runApplication
 import java.util.TimeZone
 
 @SpringBootApplication
-class MeowChattingApplication {
-    @PostConstruct
-    fun init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"))
-    }
-}
+class MeowChattingApplication
 
 fun main(args: Array<String>) {
     runApplication<MeowChattingApplication>(*args)
