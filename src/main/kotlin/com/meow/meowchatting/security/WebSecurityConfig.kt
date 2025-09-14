@@ -14,7 +14,7 @@ class WebSecurityConfig {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf { it.disable() }
-            .cors { }
+            .cors { } // CorsConfigurationSource Bean 참조 및 CORS 활성화
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth.anyRequest().permitAll()
