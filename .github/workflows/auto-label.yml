@@ -4,6 +4,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   label:
     name: 라벨 지정
@@ -28,7 +33,7 @@ jobs:
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: hotfix   # 커스텀 라벨 생성 필요
+          labels: hotfix
 
       - name: 문서 라벨 달기
         if: startsWith(github.head_ref, 'docs/')
@@ -42,27 +47,27 @@ jobs:
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: refactor   # 커스텀 라벨 생성 필요
+          labels: refactor
 
       - name: 잡무 라벨 달기
         if: startsWith(github.head_ref, 'chore/')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: chore   # 커스텀 라벨 생성 필요
+          labels: chore
 
       - name: 테스트 라벨 달기
         if: startsWith(github.head_ref, 'test/')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: test   # 커스텀 라벨 생성 필요
+          labels: test
 
       - name: CI 라벨 달기
         if: startsWith(github.head_ref, 'ci/')
         uses: actions-ecosystem/action-add-labels@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: ci   # 커스텀 라벨 생성 필요
+          labels: ci
 
 
