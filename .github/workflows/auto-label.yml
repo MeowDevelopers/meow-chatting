@@ -1,0 +1,68 @@
+name: PR 라벨 자동 달기
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  label:
+    name: 라벨 지정
+    runs-on: ubuntu-latest
+    steps:
+      - name: 기능 라벨 달기
+        if: startsWith(github.head_ref, 'feature/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: feature
+
+      - name: 버그 라벨 달기
+        if: startsWith(github.head_ref, 'bugfix/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: bug
+
+      - name: 핫픽스 라벨 달기
+        if: startsWith(github.head_ref, 'hotfix/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: hotfix   # 커스텀 라벨 생성 필요
+
+      - name: 문서 라벨 달기
+        if: startsWith(github.head_ref, 'docs/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: documentation
+
+      - name: 리팩터링 라벨 달기
+        if: startsWith(github.head_ref, 'refactor/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: refactor   # 커스텀 라벨 생성 필요
+
+      - name: 잡무 라벨 달기
+        if: startsWith(github.head_ref, 'chore/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: chore   # 커스텀 라벨 생성 필요
+
+      - name: 테스트 라벨 달기
+        if: startsWith(github.head_ref, 'test/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: test   # 커스텀 라벨 생성 필요
+
+      - name: CI 라벨 달기
+        if: startsWith(github.head_ref, 'ci/')
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ci   # 커스텀 라벨 생성 필요
+
+
