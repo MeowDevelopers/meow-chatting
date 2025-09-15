@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Date
 import javax.crypto.SecretKey
 
@@ -21,15 +22,12 @@ class JwtProvider (
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
 
     fun generateToken(username: String, roles: List<Any> = emptyList()): String {
-        val nowLdt = LocalDateTime.now()
-        val expiresAtLdt  = nowLdt.plusSeconds(accessExpiration)
-
-        val now = Date.from(nowLdt.atZone(ZoneId.systemDefault()).toInstant())
-        val expiresAt = Date.from(expiresAtLdt.atZone(ZoneId.systemDefault()).toInstant())
+        val now = Date().time
+        val expiresAt = Date(now + accessExpiration * 1000)
 
         return Jwts.builder()
             .subject(username)
-            .issuedAt(now)
+            .issuedAt(Date(now))
             .expiration(expiresAt)
             .claim("roles", roles)
             .signWith(key, SignatureAlgorithm.HS256)
@@ -37,18 +35,15 @@ class JwtProvider (
     }
 
     fun generateRefreshToken(username: String, roles: List<String>): String {
-        val nowLdt = LocalDateTime.now()
-        val expiresAtLdt  = nowLdt.plus(refreshExpiration)
-
-        val now = Date.from(nowLdt.atZone(ZoneId.systemDefault()).toInstant())
-        val expiresAt = Date.from(expiresAtLdt.atZone(ZoneId.systemDefault()).toInstant())
+        val now = Date().time
+        val expiresAt = Date(now + refreshExpiration.toMillis())
 
         return Jwts.builder()
             .subject(username)
-            .issuedAt(now)
+            .issuedAt(Date(now))
             .expiration(expiresAt)
             .claim("roles", roles)
-            .signWith(key)
+            .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }
 
@@ -68,5 +63,18 @@ class JwtProvider (
 
         val roles = claims["roles"] as? List<*> ?: emptyList<Any>()
         return roles.map { SimpleGrantedAuthority(it.toString()) }
+    }
+
+    fun getAccessToken(authorizationHeader: String?): String? {
+        val prefix = "Bearer "
+
+        if (authorizationHeader.isNullOrBlank() || !authorizationHeader.startsWith(prefix, ignoreCase = true)) {
+            return null
+        }
+
+        val token = authorizationHeader.substring(prefix.length).trim()
+        if (token.isBlank()) return null
+
+        return if (validateToken(token)) token else null
     }
 }
