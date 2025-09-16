@@ -46,6 +46,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("com.google.code.gson:gson:2.11.0")
 
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
