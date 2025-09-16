@@ -1,4 +1,8 @@
-jwt:
-  secret-key: ${JWT_SECRET}
-  access.expiration: 21600
-  refresh.expiration: 86400
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: local
+  main:
+    log-startup-info: false
