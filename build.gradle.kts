@@ -5,7 +5,7 @@ plugins {
     id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
 
-    id("org.flywaydb.flyway") version "11.13.0"
+    id("org.flywaydb.flyway") version "7.2.0"
 
     java
 }
@@ -54,8 +54,7 @@ dependencies {
     implementation ("io.netty:netty-resolver-dns-native-macos:4.1.72.Final:osx-aarch_64")
 
     // MySQL
-    runtimeOnly("com.mysql:mysql-connector-j")
-
+    implementation("com.mysql:mysql-connector-j:8.2.0")
 
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
@@ -67,6 +66,13 @@ kotlin {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
+
+flyway {
+    url = "jdbc:mysql://127.0.0.1:3400/meow?useSSL=false&allowPublicKeyRetrieval=true"
+    user = "meow"
+    password = "1234qwer"
+}
+
 
 tasks.withType<Test> {
     useJUnitPlatform()
