@@ -1,4 +1,4 @@
 jwt:
   secret-key: ${JWT_SECRET}
   access.expiration: 21600
-  refresh.expiration: 86400
+  refresh.expiration: 180d

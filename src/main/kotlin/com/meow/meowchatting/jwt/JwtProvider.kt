@@ -6,9 +6,10 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
-import java.time.Instant
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Date
 import javax.crypto.SecretKey
 
@@ -16,37 +17,33 @@ import javax.crypto.SecretKey
 class JwtProvider (
     @Value("\${jwt.secret-key}") private val secret: String,
     @Value("\${jwt.access.expiration}") private val accessExpiration: Long,
-    @Value("\${jwt.refresh.expiration}") private val refreshExpiration: Long
+    @Value("\${jwt.refresh.expiration}") private val refreshExpiration: Duration
 ) {
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
-    private val zone: ZoneId = ZoneId.of("Asia/Seoul")
 
     fun generateToken(username: String, roles: List<Any> = emptyList()): String {
-        val now = Instant.now()
-        val expiresAt  = now.plusSeconds(accessExpiration)
+        val now = Date().time
+        val expiresAt = Date(now + accessExpiration * 1000)
 
         return Jwts.builder()
             .subject(username)
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(expiresAt))
+            .issuedAt(Date(now))
+            .expiration(expiresAt)
             .claim("roles", roles)
             .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }
 
     fun generateRefreshToken(username: String, roles: List<String>): String {
-        val nowLdt = LocalDateTime.now(zone)
-        val expiresAtLdt  = nowLdt.plusSeconds(refreshExpiration)
-
-        val now = Date.from(nowLdt.atZone(zone).toInstant())
-        val expiresAt = Date.from(expiresAtLdt.atZone(zone).toInstant())
+        val now = Date().time
+        val expiresAt = Date(now + refreshExpiration.toMillis())
 
         return Jwts.builder()
             .subject(username)
-            .issuedAt(now)
+            .issuedAt(Date(now))
             .expiration(expiresAt)
             .claim("roles", roles)
-            .signWith(key)
+            .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }
 
@@ -66,5 +63,18 @@ class JwtProvider (
 
         val roles = claims["roles"] as? List<*> ?: emptyList<Any>()
         return roles.map { SimpleGrantedAuthority(it.toString()) }
+    }
+
+    fun getAccessToken(authorizationHeader: String?): String? {
+        val prefix = "Bearer "
+
+        if (authorizationHeader.isNullOrBlank() || !authorizationHeader.startsWith(prefix, ignoreCase = true)) {
+            return null
+        }
+
+        val token = authorizationHeader.substring(prefix.length).trim()
+        if (token.isBlank()) return null
+
+        return if (validateToken(token)) token else null
     }
 }
