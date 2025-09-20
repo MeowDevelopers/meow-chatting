@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: meow-chatting
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  flyway:
+    enabled: false
+    outOfOrder: true
+
+redis:
+  host: localhost
+  port: 6400
+
+jwt:
+  secret-key: ${JWT_SECRET}
+  access.expiration: 21600
+  refresh.expiration: 86400
