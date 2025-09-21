@@ -1,7 +1,8 @@
+server:
+  port: 8080
+
 spring:
   profiles:
     active: local
-jwt:
-  secret-key: ${JWT_SECRET}
-  access.expiration: 21600
-  refresh.expiration: 180d
+  main:
+    log-startup-info: false

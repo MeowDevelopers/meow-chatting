@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  mysql:
+    container_name: meow-mysql
+    image: mysql:8.0
+    platform: linux/amd64
+    volumes:
+      - ./my.cnf:/etc/mysql/my.cnf
+    environment:
+      - MYSQL_ROOT_PASSWORD= ${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE={MYSQL_DATABASE}
+      - MYSQL_USER={MYSQL_USER}
+      - MYSQL_PASSWORD={MYSQL_PASSWORD}
+    ports:
+      - 3400:3306
+    command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+
+  redis:
+    container_name: meow-redis
+    image: redis:latest
+    ports:
+      - 6400:6379
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    restart: always
+    command: redis-server /usr/local/conf/redis.conf
