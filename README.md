@@ -30,30 +30,28 @@ meow-chatting/
 ├── src/main/kotlin/com/meow/meowchatting/
 │    ├── config/
 │    │    ├── SecurityConfig.kt
-│    └── jwt/
-│         ├── JwtAuthenticationFilter.kt
-│         └── JwtProvider.kt
-│
-├── src/main/java/com/meow/meowchatting/
+│    ├── jwt/
+│    │    ├── JwtAuthenticationFilter.kt
+│    │    └── JwtProvider.kt
 │    ├── user/
 │    │    ├── command/
 │    │    │    ├── service/
-│    │    │    │    └── UserCommandService.java
+│    │    │    │    └── UserCommandService.kt
 │    │    │    ├── domain/
-│    │    │    │    ├── User.java
-│    │    │    │    ├── UserProfile.java
+│    │    │    │    ├── User.kt
+│    │    │    │    ├── UserProfile.kt
 │    │    │    │    └── Friend.java
 │    │    │    ├── controller/
 │    │    │    │    └── UserCommandController.java
 │    │    │    ├── repository/
-│    │    │    │    └── UserCommandRepository.java
+│    │    │    │    └── UserCommandRepository.kt
 │    │    │    └── dto/
-│    │    │         └── UserRequest.java
+│    │    │         └── UserRequest.kt
 │    │    ├── query/
 │    │    │    ├── service/
-│    │    │    │    └── UserQueryService.java
+│    │    │    │    └── UserQueryService.kt
 │    │    │    ├── dto/
-│    │    │    │    └── UserResponse.java
+│    │    │    │    └── UserResponse.kt
 │    │    │    ├── controller/
 │    │    │    │    └── UserQueryController.java
 │    │    │    └── repository/
@@ -64,9 +62,9 @@ meow-chatting/
 │    │    │    ├── service/
 │    │    │    │    └── RefreshTokenCommandService.java
 │    │    │    ├── domain/
-│    │    │    │    └── RefreshToken.java
+│    │    │    │    └── RefreshToken.kt
 │    │    │    ├── controller/
-│    │    │    │    └── RefreshTokenCommandController.java
+│    │    │    │    └── RefreshTokenCommandController.kt
 │    │    │    ├── repository/
 │    │    │    │    └── RefreshTokenCommandRepository.java
 │    │    │    └── dto/
