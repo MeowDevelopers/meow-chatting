@@ -1,8 +1,7 @@
 package com.meow.meowchatting.controller.user
 
-import com.meow.meowchatting.service.user.dto.FriendDto
-import com.meow.meowchatting.service.user.dto.FriendRemoveRequest
-import com.meow.meowchatting.service.user.dto.FriendRemovedResponseDto
+import com.meow.meowchatting.common.response.DataResponse
+import com.meow.meowchatting.service.user.dto.*
 import com.meow.meowchatting.service.user.service.UserFriendService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -10,7 +9,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -29,10 +29,15 @@ class UserFriendController(
         return userFriendService.getUserFriends(userId, PageRequest.of(page, size))
     }
 
-    @PatchMapping(name = "친구 이름 변경")
-    fun patchFriendName(): String {
-        userFriendService.modFriendName()
-        return ""
+    @PutMapping("/{friendId}/name")
+    fun putFriendName(
+        @PathVariable friendId: Long,
+        @RequestParam userId: Long,
+        @Valid @RequestBody request: RenameFriendRequest
+    ): DataResponse<RenameFriendResponse> {
+        val renameResult = userFriendService.modFriendName(userId, friendId, request.userName)
+
+        return renameResult
     }
 
     @DeleteMapping(name = "친구 삭제")

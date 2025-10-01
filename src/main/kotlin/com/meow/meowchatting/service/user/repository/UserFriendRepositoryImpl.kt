@@ -22,7 +22,6 @@ class UserFriendRepositoryImpl(private val em: EntityManager) : UserFriendReposi
     private val userProfile: QUserProfile = QUserProfile.userProfile
 
     override fun findFriendsByUserId(userId: Long, pageable: Pageable): Page<FriendDto> {
-//        TODO("Not yet implemented")
         val content: List<FriendDto> = queryFactory
             .select(
                 Projections.constructor(
@@ -37,7 +36,6 @@ class UserFriendRepositoryImpl(private val em: EntityManager) : UserFriendReposi
             .join(user).on(friend.friendUserId.eq(user.id))
             .leftJoin(userProfile).on(userProfile.userId.eq(friend.friendUserId))
             .where(friend.userId.eq(userId))
-//            .orderBy(applySort(pageable.sort, user))
             .offset(pageable.offset)
             .limit(pageable.pageSize.toLong())
             .fetch()

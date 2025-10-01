@@ -1,7 +1,6 @@
 package com.meow.meowchatting.service.user.repository
 
 import com.meow.meowchatting.service.user.dto.FriendDto
-import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
