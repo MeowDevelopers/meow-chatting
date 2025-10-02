@@ -23,7 +23,7 @@ class Friend : AbstractBaseEntity() {
     var friendName: String = ""
 
     @Column(name = "is_blocked", nullable = false)
-    val isBlocked: Boolean = false
+    var isBlocked: Boolean = false
 
     @Column(name = "deleted_at", nullable = false)
     var deletedAt: LocalDateTime = LocalDateTime.now()

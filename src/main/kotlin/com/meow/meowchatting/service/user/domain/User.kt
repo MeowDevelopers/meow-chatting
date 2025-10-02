@@ -18,16 +18,16 @@ import java.time.LocalDateTime
 class User : AbstractBaseEntity(){
 
     @Column(name = "user_email", nullable = false)
-    val userEmail: String = ""
+    var userEmail: String = ""
 
     @Column(name = "user_name", nullable = false)
-    val userName: String = ""
+    var userName: String = ""
 
     @Column(name = "provider_type", nullable = true)
-    val providerType: String = ""
+    var providerType: String = ""
 
     @Column(nullable = true)
-    val dormancy : String = ""
+    var dormancy : String = ""
 
     @Column(name = "deleted_at", nullable = false)
     var deletedAt: LocalDateTime = LocalDateTime.now()

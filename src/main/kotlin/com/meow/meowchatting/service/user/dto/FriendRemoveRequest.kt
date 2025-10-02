@@ -1,7 +1,7 @@
 package com.meow.meowchatting.service.user.dto
 
 data class FriendRemoveRequest(
-    val userId: Long,
-    val friendId: Long,
-    val isHardDelete: Boolean
+    var userId: Long,
+    var friendId: Long,
+    var isHardDelete: Boolean
 )
