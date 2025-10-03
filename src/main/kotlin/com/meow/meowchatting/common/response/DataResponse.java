@@ -7,27 +7,21 @@ import lombok.Getter;
 @Getter
 public class DataResponse<T> {
 
-
-	private final MeowCode meowCode;
+	private final int code;
 
 	private final String message;
 
-	private T response;
+	private T data;
 
-	public DataResponse(MeowCode meowCode, T response) {
-		this.meowCode = meowCode;
+	public DataResponse(MeowCode meowCode, T data) {
+		this.code = meowCode.getResponseCode();
 		this.message = meowCode.getResponseMessage();
-		this.response = response;
+		this.data = data;
 	}
 
 	public DataResponse(MeowCode meowCode) {
-		this.meowCode = meowCode;
+		this.code = meowCode.getResponseCode();
 		this.message = meowCode.getResponseMessage();
-	}
-
-	public DataResponse(String message) {
-		this.meowCode = null;
-		this.message = message;
 	}
 
 }

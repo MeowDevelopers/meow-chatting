@@ -1,5 +1,7 @@
 package com.meow.meowchatting.common.exception;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * [Meow Code 명명 규칙]
  * - 클래스 : Meow{도메인명}Code
@@ -10,5 +12,7 @@ public interface MeowCode {
 	int getResponseCode();
 
 	String getResponseMessage();
+
+	HttpStatus getHttpStatus();
 
 }

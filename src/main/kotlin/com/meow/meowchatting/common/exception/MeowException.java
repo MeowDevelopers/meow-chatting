@@ -8,6 +8,7 @@ public class MeowException extends RuntimeException {
 	private final MeowCode meowCode;
 
 	public MeowException(MeowCode meowCode) {
+		super(meowCode.getResponseMessage());
 		this.meowCode = meowCode;
 	}
 
