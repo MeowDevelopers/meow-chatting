@@ -6,7 +6,7 @@ CREATE TABLE refresh_token
 		refresh_token        VARCHAR(255) NULL COMMENT 'RefreshToken',
 		created_at           DATETIME(6) NOT NULL COMMENT '생성일',
 		modified_at          DATETIME(6) NOT NULL COMMENT '수정일',
-		deleted_at           DATETIME(6) NOT NULL COMMENT '삭제일',
+		deleted_at           DATETIME(6) NULL COMMENT '삭제일',
 
 		INDEX                idx_user_id (user_id) COMMENT '유저 ID index'
 ) ENGINE = InnoDB

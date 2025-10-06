@@ -1,11 +1,12 @@
 package com.meow.meowchatting
 
-import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
-import java.util.TimeZone
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
 @SpringBootApplication
+@EnableJpaAuditing
 class MeowChattingApplication
 
 fun main(args: Array<String>) {

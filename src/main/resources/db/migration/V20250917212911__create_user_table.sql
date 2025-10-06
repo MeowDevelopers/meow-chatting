@@ -9,7 +9,7 @@ CREATE TABLE user
 		dormancy             BOOLEAN NOT NULL DEFAULT false COMMENT '휴면 계정 여부',
 		created_at           DATETIME(6) NOT NULL COMMENT '생성일',
 		modified_at          DATETIME(6) NOT NULL COMMENT '수정일',
-		deleted_at           DATETIME(6) NOT NULL COMMENT '삭제일',
+		deleted_at           DATETIME(6) NULL COMMENT '삭제일',
 
 		UNIQUE KEY           uk_provider (provider_type, provider_id),
 		INDEX                idx_email (user_email) COMMENT '카카오 이메일 index',

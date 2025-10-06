@@ -1,15 +1,12 @@
 package com.meow.meowchatting.jwt
 
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.time.Duration
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+
 import java.util.Date
 import javax.crypto.SecretKey
 
@@ -30,7 +27,7 @@ class JwtProvider (
             .issuedAt(Date(now))
             .expiration(expiresAt)
             .claim("roles", roles)
-            .signWith(key, SignatureAlgorithm.HS256)
+            .signWith(key, Jwts.SIG.HS256)
             .compact()
     }
 
@@ -43,7 +40,7 @@ class JwtProvider (
             .issuedAt(Date(now))
             .expiration(expiresAt)
             .claim("roles", roles)
-            .signWith(key, SignatureAlgorithm.HS256)
+            .signWith(key, Jwts.SIG.HS256)
             .compact()
     }
 
