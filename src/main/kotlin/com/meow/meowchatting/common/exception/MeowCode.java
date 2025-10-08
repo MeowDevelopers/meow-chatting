@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
  */
 public interface MeowCode {
 
-	int getResponseCode();
-
 	String getResponseMessage();
 
 	HttpStatus getHttpStatus();
