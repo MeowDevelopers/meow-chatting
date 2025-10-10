@@ -78,3 +78,12 @@ flyway {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// Java 컴파일러가 Kotlin 소스와 Java 소스를 함께 인식하도록 지정
+sourceSets {
+    main {
+        java {
+            setSrcDirs(listOf("src/main/java", "src/main/kotlin"))
+        }
+    }
+}
