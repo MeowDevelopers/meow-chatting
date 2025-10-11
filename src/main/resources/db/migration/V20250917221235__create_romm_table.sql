@@ -6,9 +6,9 @@ CREATE TABLE room
     room_name          VARCHAR(100) NOT NULL COMMENT '채팅방 이름',
     room_owner_user_id BIGINT UNSIGNED NOT NULL COMMENT '채팅방 생성자 ID',
 
-		created_at         DATETIME(6) NOT NULL COMMENT '생성일',
-		modified_at        DATETIME(6) NOT NULL COMMENT '수정일',
-		deleted_at         DATETIME(6) NOT NULL COMMENT '삭제일'
+    created_at         DATETIME(6) NOT NULL COMMENT '생성일',
+    modified_at        DATETIME(6) NOT NULL COMMENT '수정일',
+    deleted_at         DATETIME(6) NULL COMMENT '삭제일'
 ) ENGINE = InnoDB
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci
