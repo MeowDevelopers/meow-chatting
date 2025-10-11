@@ -6,7 +6,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class KakaoOauthConfig {
     private final ClientRegistration kakaoRegistration;
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.meow.meowchatting.user.command.domain.User;
 import com.meow.meowchatting.user.command.domain.UserProfile;
-import com.meow.meowchatting.user.command.enums.ProviderType;
+import com.meow.meowchatting.auth.command.enums.ProviderType;
 
 import java.time.LocalDateTime;
 

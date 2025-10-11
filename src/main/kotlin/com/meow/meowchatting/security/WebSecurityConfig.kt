@@ -1,8 +1,10 @@
 package com.meow.meowchatting.security
 
+import com.meow.meowchatting.auth.command.client.ProviderTypeConverter
 import com.meow.meowchatting.jwt.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.format.FormatterRegistry
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -32,7 +34,7 @@ class WebSecurityConfig(
             .cors { } // CorsConfigurationSource Bean 참조 및 CORS 활성화
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/v1/auth/**").permitAll()
+                it.requestMatchers("/api/v1/oauth/**").permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)

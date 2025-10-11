@@ -7,6 +7,7 @@ import com.meow.meowchatting.auth.command.dto.KakaoLoginResponseDto;
 import com.meow.meowchatting.auth.command.dto.KakaoUserResponse;
 import com.meow.meowchatting.auth.command.dto.OauthToken;
 import com.meow.meowchatting.auth.command.enums.AuthResponseCode;
+import com.meow.meowchatting.auth.command.exception.AuthException;
 import com.meow.meowchatting.common.response.DataResponse;
 import com.meow.meowchatting.jwt.JwtProvider;
 import com.meow.meowchatting.user.command.domain.RefreshToken;
@@ -19,9 +20,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class KakaoAuthService {
@@ -44,21 +47,35 @@ public class KakaoAuthService {
         this.jwtProvider = jwtProvider;
     }
 
-
-    public String getAuthCodeRequestUrl(){
-        return UriComponentsBuilder
-                .fromHttpUrl(kakaoOauthConfig.getAuthorizationUri())
-                .queryParam("response_type", "code")
-                .queryParam("client_id", kakaoOauthConfig.getClientId())
-                .queryParam("redirect_uri", kakaoOauthConfig.getRedirectUri())
-                .toUriString();
+    private void validateOauthConfig(){
+        if (Stream.of(
+                kakaoOauthConfig.getAuthorizationUri(),
+                kakaoOauthConfig.getClientId(),
+                kakaoOauthConfig.getRedirectUri(),
+                kakaoOauthConfig.getClientSecret()
+                ).anyMatch(ObjectUtils::isEmpty)) {
+            throw new AuthException(AuthResponseCode.OAUTH_CONFIG_ERROR);
+        }
     }
 
-    public ResponseEntity<DataResponse<KakaoLoginResponseDto>> login(String authCode) throws JsonProcessingException {
+    public String getAuthCodeRequestUrl(){
+        validateOauthConfig();
+        try {
+            return UriComponentsBuilder
+                    .fromHttpUrl(kakaoOauthConfig.getAuthorizationUri())
+                    .queryParam("response_type", "code")
+                    .queryParam("client_id", kakaoOauthConfig.getClientId())
+                    .queryParam("redirect_uri", kakaoOauthConfig.getRedirectUri())
+                    .toUriString();
+        } catch (IllegalArgumentException e) {
+            throw new AuthException(AuthResponseCode.INVALID_AUTH_URI);
+        }
+    }
 
+
+    public ResponseEntity<DataResponse<KakaoLoginResponseDto>> login(String authCode) throws JsonProcessingException {
         MultiValueMap<String, String> requestParams = tokenRequestParams(authCode);
         OauthToken tokenInfo = kakaoApiClient.fetchToken(requestParams);
-
         KakaoUserResponse kakaoUser = kakaoApiClient.fetchMember("Bearer "+ tokenInfo.getAccessToken());
 
         User user = userCommandRepository.findByUserEmail(kakaoUser.kakaoAccount().email())
@@ -73,8 +90,6 @@ public class KakaoAuthService {
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
                 .map(existing -> existing.update(refreshToken))
                 .orElseGet(() -> refreshTokenRepository.save(new RefreshToken(user.getId(), refreshToken)));
-
-
         return ResponseEntity.ok(
                 new DataResponse<>(AuthResponseCode.LOGIN_SUCCESS,
                         KakaoLoginResponseDto.of(user, userProfile, accessToken, refreshToken)
@@ -82,6 +97,8 @@ public class KakaoAuthService {
         );
     }
     private MultiValueMap<String, String> tokenRequestParams(String authCode) {
+        validateOauthConfig();
+
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", kakaoOauthConfig.getClientId());

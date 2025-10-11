@@ -3,16 +3,15 @@ package com.meow.meowchatting.auth.command.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.meow.meowchatting.auth.command.dto.KakaoLoginRequestDto;
 import com.meow.meowchatting.auth.command.dto.KakaoLoginResponseDto;
-import com.meow.meowchatting.auth.command.dto.KakaoUserResponse;
 import com.meow.meowchatting.auth.command.enums.AuthResponseCode;
 import com.meow.meowchatting.auth.command.service.KakaoAuthService;
 import com.meow.meowchatting.common.response.DataResponse;
-import com.meow.meowchatting.user.command.enums.ProviderType;
+import com.meow.meowchatting.auth.command.enums.ProviderType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/v1/auth")
+@RequestMapping(value = "/api/v1/oauth", name = "카카오 인증 컨트롤러")
 @RestController
 public class KakaoAuthController {
 
@@ -22,21 +21,19 @@ public class KakaoAuthController {
         this.kakaoAuthService = kakaoAuthService;
     }
 
-    @GetMapping("/{providerType}")
-    public DataResponse<String> redirectAuthCodeRequestUrl(@PathVariable String providerType){
-        ProviderType type = ProviderType.Companion.fromName(providerType);
-        if (ObjectUtils.isEmpty(type)){
-            throw new IllegalArgumentException("잘못된 요청입니다.");
+    @GetMapping(value = "/{providerType}", name = "인가코드 받는 API")
+    public DataResponse<String> redirectAuthCodeRequestUrl(@PathVariable("providerType") ProviderType providerType){
+        if (ObjectUtils.isEmpty(providerType)) {
+            return new DataResponse<>(AuthResponseCode.NOT_FOUND_PROVIDER_TYPE);
         }
-
         String redirectUrl = kakaoAuthService.getAuthCodeRequestUrl();
         return new DataResponse<>(AuthResponseCode.OAUTH_AUTHORIZE_SUCCESS, redirectUrl);
 
     }
 
-    @PostMapping("/login/{providerType}")
+    @PostMapping(value = "/login", name = "카카오 토큰 발급 API")
     public ResponseEntity<DataResponse<KakaoLoginResponseDto>> login(
-            @PathVariable String providerType, @RequestBody KakaoLoginRequestDto kakaoLoginRequestDto) throws JsonProcessingException{
+            @RequestBody KakaoLoginRequestDto kakaoLoginRequestDto) throws JsonProcessingException{
         return kakaoAuthService.login(kakaoLoginRequestDto.getCode());
     }
 }

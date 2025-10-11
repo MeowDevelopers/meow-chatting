@@ -1,7 +1,7 @@
 package com.meow.meowchatting.user.command.domain
 
 import com.meow.meowchatting.common.base.AbstractBaseUserByEntity
-import com.meow.meowchatting.user.command.enums.ProviderType
+import com.meow.meowchatting.auth.command.enums.ProviderType
 import jakarta.persistence.*
 
 @Entity
@@ -25,4 +25,4 @@ class User (
     @Column(name = "dormancy", nullable = false)
     val dormancy : Boolean = false,
 
-) : AbstractBaseUserByEntity()
+    ) : AbstractBaseUserByEntity()

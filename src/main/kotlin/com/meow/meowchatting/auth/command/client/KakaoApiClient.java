@@ -4,21 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meow.meowchatting.auth.command.dto.KakaoUserResponse;
 import com.meow.meowchatting.auth.command.dto.OauthToken;
+import com.meow.meowchatting.auth.command.enums.AuthResponseCode;
+import com.meow.meowchatting.auth.command.exception.AuthException;
 import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.service.annotation.GetExchange;
-import org.springframework.web.service.annotation.PostExchange;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 
 @Service
@@ -33,24 +29,32 @@ public class KakaoApiClient {
 
 
     public OauthToken fetchToken(MultiValueMap<String, String> params) {
-        String rawResponse = webClient.post()
-                .uri("/oauth/token")
-                .body(BodyInserters.fromFormData(params))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        return new Gson().fromJson(rawResponse, OauthToken.class);
+        try {
+            String rawResponse = webClient.post()
+                    .uri("/oauth/token")
+                    .body(BodyInserters.fromFormData(params))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            return new Gson().fromJson(rawResponse, OauthToken.class);
+        } catch ( WebClientResponseException e ) {
+            throw new AuthException(AuthResponseCode.INVALID_AUTH_CODE);
+        }
     }
 
 
     public KakaoUserResponse fetchMember(String bearerToken) throws JsonProcessingException {
-        String rawResponse = WebClient.create("https://kapi.kakao.com")
-                .get()
-                .uri("/v2/user/me")
-                .header(HttpHeaders.AUTHORIZATION, bearerToken)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        return objectMapper.readValue(rawResponse, KakaoUserResponse.class);
+        try {
+            String rawResponse = WebClient.create("https://kapi.kakao.com")
+                    .get()
+                    .uri("/v2/user/me")
+                    .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            return objectMapper.readValue(rawResponse, KakaoUserResponse.class);
+        } catch (WebClientResponseException e) {
+            throw new AuthException(AuthResponseCode.INVALID_ACCESS_TOKEN);
+        }
     }
 }
