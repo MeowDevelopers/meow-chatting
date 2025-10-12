@@ -73,7 +73,7 @@ public class KakaoAuthService {
     }
 
 
-    public ResponseEntity<DataResponse<KakaoLoginResponseDto>> login(String authCode) throws JsonProcessingException {
+    public ResponseEntity<DataResponse<KakaoLoginResponseDto>> login(String authCode) {
         MultiValueMap<String, String> requestParams = tokenRequestParams(authCode);
         OauthToken tokenInfo = kakaoApiClient.fetchToken(requestParams);
         KakaoUserResponse kakaoUser = kakaoApiClient.fetchMember("Bearer "+ tokenInfo.getAccessToken());

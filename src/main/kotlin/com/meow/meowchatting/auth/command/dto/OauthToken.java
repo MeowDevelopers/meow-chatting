@@ -1,30 +1,32 @@
 package com.meow.meowchatting.auth.command.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nimbusds.jose.shaded.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class OauthToken {
-    @SerializedName("token_type")
-    String tokenType;
 
-    @SerializedName("access_token")
-    String accessToken;
+    @JsonProperty("token_type")
+    private String tokenType;
 
-    @SerializedName("id_token")
-    String idToken;
+    @JsonProperty("access_token")
+    private String accessToken;
 
-    @SerializedName("expires_in")
-    Integer expiresIn;
+    @JsonProperty("id_token")
+    private String idToken;
 
-    @SerializedName("refresh_token")
-    String refreshToken;
+    @JsonProperty("expires_in")
+    private Integer expiresIn;
 
-    @SerializedName("refresh_token_expires_in")
-    Integer refreshTokenExpiresIn;
-    String scope;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
+
+    @JsonProperty("refresh_token_expires_in")
+    private Integer refreshTokenExpiresIn;
+
+    private String scope;
 }

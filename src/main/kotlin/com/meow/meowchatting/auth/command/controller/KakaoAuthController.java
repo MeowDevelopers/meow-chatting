@@ -33,7 +33,7 @@ public class KakaoAuthController {
 
     @PostMapping(value = "/login", name = "카카오 토큰 발급 API")
     public ResponseEntity<DataResponse<KakaoLoginResponseDto>> login(
-            @RequestBody KakaoLoginRequestDto kakaoLoginRequestDto) throws JsonProcessingException{
+            @RequestBody KakaoLoginRequestDto kakaoLoginRequestDto) {
         return kakaoAuthService.login(kakaoLoginRequestDto.getCode());
     }
 }
