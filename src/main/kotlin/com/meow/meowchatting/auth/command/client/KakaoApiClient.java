@@ -20,15 +20,19 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @RequiredArgsConstructor
 public class KakaoApiClient {
 
-    private final WebClient webClient = WebClient.builder()
+    private final WebClient webAuthClient = WebClient.builder()
             .baseUrl("https://kauth.kakao.com")
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
             .build();
 
+    private final WebClient webApiClient = WebClient.builder()
+            .baseUrl("https://kapi.kakao.com")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
 
     public OauthToken fetchToken(MultiValueMap<String, String> params) {
         try {
-            return webClient.post()
+            return webAuthClient.post()
                     .uri("/oauth/token")
                     .body(BodyInserters.fromFormData(params))
                     .retrieve()
@@ -46,8 +50,7 @@ public class KakaoApiClient {
 
     public KakaoUserResponse fetchMember(String bearerToken) {
         try {
-            return WebClient.create("https://kapi.kakao.com")
-                    .get()
+            return webApiClient.get()
                     .uri("/v2/user/me")
                     .header(HttpHeaders.AUTHORIZATION, bearerToken)
                     .retrieve()
