@@ -25,11 +25,6 @@ public enum AuthResponseCode implements MeowCode {
 
 
     @Override
-    public int getResponseCode() {
-        return httpStatus.value();
-    }
-
-    @Override
     public String getResponseMessage() {
         return responseMessage;
     }
