@@ -1,6 +1,14 @@
 package com.meow.meowchatting.auth.command.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.stream.Stream;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import com.meow.meowchatting.auth.command.client.KakaoApiClient;
 import com.meow.meowchatting.auth.command.client.KakaoOauthConfig;
 import com.meow.meowchatting.auth.command.dto.KakaoLoginResponseDto;
@@ -13,18 +21,10 @@ import com.meow.meowchatting.jwt.JwtProvider;
 import com.meow.meowchatting.user.command.domain.RefreshToken;
 import com.meow.meowchatting.user.command.domain.User;
 import com.meow.meowchatting.user.command.domain.UserProfile;
+import com.meow.meowchatting.user.command.enums.UserType;
 import com.meow.meowchatting.user.repository.RefreshTokenRepository;
 import com.meow.meowchatting.user.repository.UserCommandRepository;
 import com.meow.meowchatting.user.repository.UserProfileRepository;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class KakaoAuthService {
@@ -84,8 +84,8 @@ public class KakaoAuthService {
         UserProfile userProfile = userProfileRepository.findByUserId(user.getId())
                 .orElseGet(() -> userProfileRepository.save(kakaoUser.toUserProfileEntity(user.getId())));
 
-        String accessToken = jwtProvider.generateToken(user.getUserEmail(),List.of("USER"));
-        String refreshToken = jwtProvider.generateRefreshToken(user.getUserEmail(), List.of("USER"));
+        String accessToken = jwtProvider.generateAccessToken(user.getId(), UserType.ROLE_USER);
+        String refreshToken = jwtProvider.generateRefreshToken(user.getId(), UserType.ROLE_USER);
 
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(user.getId())
                 .map(existing -> existing.update(refreshToken))

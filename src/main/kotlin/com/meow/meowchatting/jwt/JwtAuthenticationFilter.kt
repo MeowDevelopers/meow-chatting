@@ -1,55 +1,66 @@
 package com.meow.meowchatting.jwt
 
-import io.jsonwebtoken.ExpiredJwtException
+import com.meow.meowchatting.common.exception.MeowException
+import com.meow.meowchatting.jwt.error.JwtResponseCode
+import com.meow.meowchatting.user.query.service.UserPrincipalQueryService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.stereotype.Component
-import org.springframework.web.filter.OncePerRequestFilter
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
+import org.springframework.stereotype.Component
+import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthenticationFilter (
-    private val jwtProvider: JwtProvider
+    private val jwtProvider: JwtProvider,
+    private val userPrincipalQueryService: UserPrincipalQueryService
 ) : OncePerRequestFilter() {
     private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
 
-    override fun doFilterInternal(req: HttpServletRequest, res: HttpServletResponse, chain: FilterChain) {
-        val header = req.getHeader("Authorization")
+    override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
+        val header = request.getHeader("Authorization")
         val token = jwtProvider.getAccessToken(header)
 
         if (token.isNullOrBlank()) {
-            chain.doFilter(req, res)
+            chain.doFilter(request, response)
             return
         }
 
         try {
-            val userName = jwtProvider.getUsername(token)
-            val authorities = jwtProvider.getAuthorities(token)
+            validateToken(token)
 
-            val userDetails = User(userName, "", authorities)
-            val auth = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities).apply {
-                details = WebAuthenticationDetailsSource().buildDetails(req)
-            }
+            val userDetails = getUserPrincipal(token)
+            val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+            authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
 
-            SecurityContextHolder.getContext().authentication = auth
+            SecurityContextHolder.getContext().authentication = authentication
 
             log.info(
-                "JWT 인증 성공: userName={}, method={}, endpoint={}, userAgent={}",
-                userName, req.method, req.requestURI, req.getHeader("User-Agent")
+                "JWT 인증 성공: method={}, endpoint={}, userAgent={}",
+                request.method, request.requestURI, request.getHeader("User-Agent")
             )
 
-            chain.doFilter(req, res)
-        } catch (e: ExpiredJwtException) {
-            SecurityContextHolder.clearContext()
-            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired")
+            chain.doFilter(request, response)
         } catch (e: Exception) {
             SecurityContextHolder.clearContext()
-            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token")
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token")
         }
+    }
+
+    private fun validateToken(token: String) {
+        if (!jwtProvider.validateToken(token)) {
+            throw MeowException(JwtResponseCode.EXPIRED)
+        }
+    }
+
+    private fun getUserPrincipal(token: String): UserDetails {
+        val claims = jwtProvider.getClaims(token)
+        val userId = claims.subject.toLong()
+
+        return userPrincipalQueryService.loadUserByUserId(userId, claims)
     }
 }
