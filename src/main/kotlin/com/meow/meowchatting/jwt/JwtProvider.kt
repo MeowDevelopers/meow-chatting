@@ -1,9 +1,10 @@
 package com.meow.meowchatting.jwt
 
+import com.meow.meowchatting.user.command.enums.UserType
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.time.Duration
 
@@ -18,28 +19,28 @@ class JwtProvider (
 ) {
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
 
-    fun generateToken(username: String, roles: List<Any> = emptyList()): String {
+    fun generateAccessToken(userId: Long, role: UserType): String {
         val now = Date().time
         val expiresAt = Date(now + accessExpiration * 1000)
 
         return Jwts.builder()
-            .subject(username)
+            .subject(userId.toString())
             .issuedAt(Date(now))
             .expiration(expiresAt)
-            .claim("roles", roles)
+            .claim("roles", role.name)
             .signWith(key, Jwts.SIG.HS256)
             .compact()
     }
 
-    fun generateRefreshToken(username: String, roles: List<String>): String {
+    fun generateRefreshToken(userId: Long, role: UserType): String {
         val now = Date().time
         val expiresAt = Date(now + refreshExpiration.toMillis())
 
         return Jwts.builder()
-            .subject(username)
+            .subject(userId.toString())
             .issuedAt(Date(now))
             .expiration(expiresAt)
-            .claim("roles", roles)
+            .claim("roles", role.name)
             .signWith(key, Jwts.SIG.HS256)
             .compact()
     }
@@ -49,18 +50,6 @@ class JwtProvider (
             .parseSignedClaims(token).payload
         claims.expiration.after(Date())
     } catch (_: Exception) { false }
-
-    fun getUsername(token: String): String =
-        Jwts.parser().verifyWith(key).build()
-            .parseSignedClaims(token).payload.subject
-
-    fun getAuthorities(token: String): List<SimpleGrantedAuthority> {
-        val claims = Jwts.parser().verifyWith(key).build()
-            .parseSignedClaims(token).payload
-
-        val roles = claims["roles"] as? List<*> ?: emptyList<Any>()
-        return roles.map { SimpleGrantedAuthority(it.toString()) }
-    }
 
     fun getAccessToken(authorizationHeader: String?): String? {
         val prefix = "Bearer "
@@ -72,6 +61,14 @@ class JwtProvider (
         val token = authorizationHeader.substring(prefix.length).trim()
         if (token.isBlank()) return null
 
-        return if (validateToken(token)) token else null
+        return token
+    }
+
+    fun getClaims(token: String): Claims {
+        return Jwts.parser()
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(token)
+            .payload
     }
 }
