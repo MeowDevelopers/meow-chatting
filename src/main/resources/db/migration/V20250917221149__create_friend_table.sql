@@ -5,7 +5,7 @@ CREATE TABLE friend
     user_id            BIGINT UNSIGNED NOT NULL COMMENT '유저 ID',
     friend_user_id     BIGINT UNSIGNED NOT NULL COMMENT '상대방 유저 ID',
     friend_name        VARCHAR(30) NOT NULL COMMENT '친구 이름',
-    is_blocked         BOOLEAN NOT NULL DEFAULT false COMMENT '차단 여부',
+    friend_status      ENUM('FRIEND', 'BLOCKED', 'REMOVED') NOT NULL COMMENT '친구 상태(친구, 차단, 삭제)',
 
     created_at         DATETIME(6) NOT NULL COMMENT '생성일',
     modified_at        DATETIME(6) NOT NULL COMMENT '수정일',

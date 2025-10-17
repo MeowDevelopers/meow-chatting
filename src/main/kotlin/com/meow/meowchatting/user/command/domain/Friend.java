@@ -1,10 +1,13 @@
 package com.meow.meowchatting.user.command.domain;
 
 import com.meow.meowchatting.common.base.AbstractBaseUserByEntity;
+import com.meow.meowchatting.user.command.enums.FriendStatusType;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +27,9 @@ public class Friend extends AbstractBaseUserByEntity {
 	@Column(name = "friend_name", nullable = false, length = 30)
 	private String friendName;
 
-	@Column(name = "is_blocked", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-	private Boolean isBlocked = false;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "friend_status", nullable = false)
+	private FriendStatusType friendStatus;
 
 	/**
 	 *  친구 이름 변경
