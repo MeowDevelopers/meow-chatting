@@ -13,7 +13,7 @@ public enum FriendResponseCode implements MeowCode {
 
 	NOT_FOUND("존재하지 않는 친구입니다.", HttpStatus.NOT_FOUND),
 
-	INVALID_OWNER("해당 친구에 대한 수정 권한이 없습니다.", HttpStatus.FORBIDDEN),;
+	INVALID_OWNER("해당 친구에 대한 권한이 없습니다.", HttpStatus.FORBIDDEN),;
 
 	private final String responseMessage;
 

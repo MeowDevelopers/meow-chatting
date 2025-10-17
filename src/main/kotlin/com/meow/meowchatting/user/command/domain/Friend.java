@@ -1,5 +1,7 @@
 package com.meow.meowchatting.user.command.domain;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.meow.meowchatting.common.base.AbstractBaseUserByEntity;
 import com.meow.meowchatting.user.command.enums.FriendStatusType;
 
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "friend")
 @Getter @NoArgsConstructor
+@SQLRestriction("deleted_at IS NULL AND friend_status = 'FRIEND'")
 @AttributeOverride(name = "id", column = @Column(name = "friend_id"))
 public class Friend extends AbstractBaseUserByEntity {
 
@@ -32,10 +35,18 @@ public class Friend extends AbstractBaseUserByEntity {
 	private FriendStatusType friendStatus;
 
 	/**
-	 *  친구 이름 변경
+	 * 친구 이름 변경
 	 */
 	public void updateFriendName(String friendName) {
 		this.friendName = friendName;
+	}
+
+	/**
+	 * 친구 삭제
+	 */
+	public void deleteFriend() {
+		markDeleted();
+		this.friendStatus = FriendStatusType.REMOVED;
 	}
 
 }

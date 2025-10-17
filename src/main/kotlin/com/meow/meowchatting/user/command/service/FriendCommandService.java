@@ -44,4 +44,18 @@ public class FriendCommandService {
 		return new DataResponse<>(FriendResponseCode.SUCCESS, FriendNameUpdateResponse.of(friend.getId(), userProfile.getUserProfileUrl(), friend.getFriendName()));
 	}
 
+	/**
+	 * 친구 삭제
+	 */
+	public DataResponse<Void> deleteFriend(Long userId, Long friendId) {
+		Friend friend = friendCommandRepository.findById(friendId).orElseThrow(() -> new MeowException(
+			FriendResponseCode.NOT_FOUND));
+
+		if (!Objects.equals(friend.getUserId(), userId)) throw new MeowException(FriendResponseCode.INVALID_OWNER);
+
+		friend.deleteFriend();
+
+		return new DataResponse<>(FriendResponseCode.SUCCESS);
+	}
+
 }
