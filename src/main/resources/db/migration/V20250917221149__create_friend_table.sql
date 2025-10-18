@@ -4,13 +4,15 @@ CREATE TABLE friend
     friend_id          BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '친구 ID',
     user_id            BIGINT UNSIGNED NOT NULL COMMENT '유저 ID',
     friend_user_id     BIGINT UNSIGNED NOT NULL COMMENT '상대방 유저 ID',
+    friend_name        VARCHAR(30) NOT NULL COMMENT '친구 이름',
+    friend_status      ENUM('FRIEND', 'BLOCKED', 'REMOVED') NOT NULL COMMENT '친구 상태(친구, 차단, 삭제)',
 
-		created_at         DATETIME(6) NOT NULL COMMENT '생성일',
-		modified_at        DATETIME(6) NOT NULL COMMENT '수정일',
-		deleted_at         DATETIME(6) NOT NULL COMMENT '삭제일',
+    created_at         DATETIME(6) NOT NULL COMMENT '생성일',
+    modified_at        DATETIME(6) NOT NULL COMMENT '수정일',
+    deleted_at         DATETIME(6) NULL COMMENT '삭제일',
 
-		UNIQUE KEY uniq_friend (user_id, friend_user_id)
+    UNIQUE KEY uniq_friend (user_id, friend_user_id)
 ) ENGINE = InnoDB
   CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci
+  COLLATE utf8mb4_0900_ai_ci
   COMMENT = '친구 테이블';

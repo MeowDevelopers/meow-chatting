@@ -1,0 +1,52 @@
+package com.meow.meowchatting.user.command.domain;
+
+import org.hibernate.annotations.SQLRestriction;
+
+import com.meow.meowchatting.common.base.AbstractBaseUserByEntity;
+import com.meow.meowchatting.user.command.enums.FriendStatusType;
+
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "friend")
+@Getter @NoArgsConstructor
+@SQLRestriction("deleted_at IS NULL AND friend_status = 'FRIEND'")
+@AttributeOverride(name = "id", column = @Column(name = "friend_id"))
+public class Friend extends AbstractBaseUserByEntity {
+
+	@Column(name = "user_id", nullable = false)
+	private Long userId;
+
+	@Column(name = "friend_user_id", nullable = false)
+	private Long friendUserId;
+
+	@Column(name = "friend_name", nullable = false, length = 30)
+	private String friendName;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "friend_status", nullable = false)
+	private FriendStatusType friendStatus;
+
+	/**
+	 * 친구 이름 변경
+	 */
+	public void updateFriendName(String friendName) {
+		this.friendName = friendName;
+	}
+
+	/**
+	 * 친구 삭제
+	 */
+	public void deleteFriend() {
+		markDeleted();
+		this.friendStatus = FriendStatusType.REMOVED;
+	}
+
+}

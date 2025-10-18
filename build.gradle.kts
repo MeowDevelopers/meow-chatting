@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
+    kotlin("kapt") version "1.9.25"
 
     id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
@@ -41,6 +42,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation ("org.springframework.boot:spring-boot-starter-jdbc")
     implementation ("com.h2database:h2")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -48,6 +50,12 @@ dependencies {
     // Java
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    // QueryDSL
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    kapt("jakarta.annotation:jakarta.annotation-api")
+    kapt("jakarta.persistence:jakarta.persistence-api")
 
     // TEST
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -75,6 +83,21 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
+}
+
+// QueryDSL
+kapt {
+    keepJavacAnnotationProcessors = true
+
+    arguments {
+        arg("querydsl.entityAccessors", "true")  // getter/setter 대신 필드 직접 접근
+        arg("querydsl.useFields", "true")
+    }
+
+    // Q 클래스 경로
+    javacOptions {
+        option("querydsl.generatedAnnotationClass", "javax.annotation.processing.Generated")
     }
 }
 
