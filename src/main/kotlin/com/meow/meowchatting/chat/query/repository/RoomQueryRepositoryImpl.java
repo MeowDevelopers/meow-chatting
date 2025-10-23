@@ -36,9 +36,9 @@ public class RoomQueryRepositoryImpl implements RoomPagedQueryRepository {
 
         List<ChatRoomListResponse> result = queryFactory
                 .select(Projections.constructor(ChatRoomListResponse.class,
-                        room.roomId, room.roomType, room.roomName, room.roomOwnerUserId, room.createdAt, room.modifiedAt))
+                        room.id, room.roomType, room.roomName, room.roomOwnerUserId, room.createdAt, room.modifiedAt))
                 .from(roomUsers)
-                .innerJoin(room).on(roomUsers.roomId.eq(room.roomId))
+                .innerJoin(room).on(roomUsers.roomId.eq(room.id))
                 .where(roomUsers.userId.eq(userId))
                 .orderBy(room.modifiedAt.desc())
                 .offset(paging.getOffset())
@@ -48,7 +48,7 @@ public class RoomQueryRepositoryImpl implements RoomPagedQueryRepository {
         Long total = Optional.ofNullable(queryFactory
                 .select(roomUsers.countDistinct())
                 .from(roomUsers)
-                .innerJoin(room).on(roomUsers.roomId.eq(room.roomId))
+                .innerJoin(room).on(roomUsers.roomId.eq(room.id))
                 .where(roomUsers.userId.eq(userId))
                 .fetchOne()).orElse(0L);
 

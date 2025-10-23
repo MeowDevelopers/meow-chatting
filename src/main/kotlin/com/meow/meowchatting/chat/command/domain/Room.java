@@ -1,6 +1,8 @@
 package com.meow.meowchatting.chat.command.domain;
 
 import com.meow.meowchatting.chat.command.enums.RoomType;
+import com.meow.meowchatting.common.base.AbstractBaseUserByEntity;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,12 +25,8 @@ import org.hibernate.annotations.Where;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Where(clause = "deleted_at IS NULL")
-public class Room {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id", nullable = false, updatable = false)
-    private Long roomId;
+@AttributeOverride(name = "id", column = @Column(name = "room_id"))
+public class Room extends AbstractBaseUserByEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "room_type", nullable = false, length = 10)
@@ -40,14 +38,6 @@ public class Room {
     @Column(name = "room_owner_user_id", nullable = false)
     private Long roomOwnerUserId;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at", nullable = false)
-    private LocalDateTime modifiedAt;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @Builder
     public Room(RoomType roomType, String roomName, Long roomOwnerUserId) {
@@ -56,23 +46,12 @@ public class Room {
         this.roomOwnerUserId = roomOwnerUserId;
     }
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.modifiedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.modifiedAt = LocalDateTime.now();
-    }
-
     public void updateRoomName(String roomName) {
         this.roomName = roomName;
     }
 
     public void deleteRoom() {
-        this.deletedAt = LocalDateTime.now();
+        setDeletedAt(LocalDateTime.now());
     }
 
 }

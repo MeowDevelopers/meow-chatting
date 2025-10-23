@@ -42,7 +42,7 @@ public class ChatRoomCreateService {
 
         // RoomUsers 저장 (방 생성자 포함)
         RoomUsers ownerRoomUser = RoomUsers.builder()
-                .roomId(savedRoom.getRoomId())
+                .roomId(savedRoom.getId())
                 .userId(userId)
                 .isActive(true)
                 .build();
@@ -51,7 +51,7 @@ public class ChatRoomCreateService {
         // 멤버들 RoomUsers 저장
         request.getMembers().forEach(member -> {
             RoomUsers roomUser = RoomUsers.builder()
-                    .roomId(savedRoom.getRoomId())
+                    .roomId(savedRoom.getId())
                     .userId(member.getUserId())
                     .isActive(true)
                     .build();
@@ -70,7 +70,7 @@ public class ChatRoomCreateService {
         String createdFormatted = formatCreatedAt(savedRoom.getCreatedAt());
 
         ChatRoomCreateResponse response = ChatRoomCreateResponse.of(
-                savedRoom.getRoomId(),
+                savedRoom.getId(),
                 savedRoom.getRoomType(),
                 savedRoom.getRoomName(),
                 createdFormatted,
