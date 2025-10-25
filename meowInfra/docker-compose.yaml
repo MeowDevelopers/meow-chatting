@@ -1,5 +1,23 @@
 version: '3.8'
 services:
+  localstack:
+    container_name: "meow-local-stack"
+    image: localstack/localstack
+    ports:
+      - "4570:4566"
+    environment:
+      - SERVICES=${SERVICES-s3}
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR- }
+      - KINESIS_ERROR_PROBABILITY=${KINESIS_ERROR_PROBABILITY- }
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - HOST_TMP_FOLDER=${TMPDIR}
+      - DEFAULT_REGION=ap-southeast-2
+      - HOSTNAME_EXTERNAL=localstack
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
   mysql:
     container_name: meow-mysql
     image: mysql:8.0
@@ -7,10 +25,10 @@ services:
     volumes:
       - ./my.cnf:/etc/mysql/my.cnf
     environment:
-      - MYSQL_ROOT_PASSWORD= ${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE={MYSQL_DATABASE}
-      - MYSQL_USER={MYSQL_USER}
-      - MYSQL_PASSWORD={MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ports:
       - 3400:3306
     command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
