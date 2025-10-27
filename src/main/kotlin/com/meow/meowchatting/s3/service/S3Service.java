@@ -1,7 +1,7 @@
 package com.meow.meowchatting.s3.service;
 
-import com.meow.meowchatting.auth.command.enums.S3Bucket;
 import com.meow.meowchatting.s3.config.AwsConfig;
+import com.meow.meowchatting.s3.enums.S3Bucket;
 import com.meow.meowchatting.s3.enums.S3UploadCode;
 import com.meow.meowchatting.s3.exception.AwsS3Exception;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +57,16 @@ public class S3Service {
         } catch (IOException e) {
             throw new AwsS3Exception(S3UploadCode.AWS_S3_UPLOAD_FAIL);
         }
+    }
+
+    public void uploadFile(S3Bucket s3Bucket, String key, byte[] fileBytes, String contentType) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(s3Bucket.getBucketName())
+                .key(key)
+                .contentType(contentType != null ? contentType : "application/octet-stream")
+                .build();
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(fileBytes));
     }
 
     public byte[] downloadFile(S3Bucket s3Bucket, String pathName) {

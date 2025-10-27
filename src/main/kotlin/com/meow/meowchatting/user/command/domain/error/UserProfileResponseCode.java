@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public enum UserProfileResponseCode implements MeowCode {
-
+	SUCCESS("정상 처리 완료",  HttpStatus.OK),
 	NOT_FOUND("존재하지 않는 유저입니다.", HttpStatus.NOT_FOUND);
 
 	private final String responseMessage;

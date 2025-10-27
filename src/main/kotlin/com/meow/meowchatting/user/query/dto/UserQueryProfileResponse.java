@@ -8,11 +8,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserQueryProfileResponse {
     private String userName;
-    private byte[] userProfile;
+    private  byte[] userProfile;
 
     @Builder
     public UserQueryProfileResponse(String userName, byte[] userProfile) {
         this.userName = userName;
         this.userProfile = userProfile;
     }
+
+    public static  UserQueryProfileResponse of(String userName, byte[] userProfile){
+        return UserQueryProfileResponse.builder()
+                .userName(userName)
+                .userProfile(userProfile)
+                .build();
+    }
+
 }

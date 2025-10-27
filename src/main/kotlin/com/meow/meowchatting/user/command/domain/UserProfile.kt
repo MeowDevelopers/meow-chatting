@@ -15,6 +15,10 @@ class UserProfile (
     val userId : Long,
 
     @Column(name = "user_profile_url", nullable = false)
-    val userProfileUrl : String
+    var userProfileUrl : String
 
-): AbstractBaseUserByEntity()
+): AbstractBaseUserByEntity(){
+    fun updateProfileUrl(newUrl: String) {
+        this.userProfileUrl = newUrl
+    }
+}

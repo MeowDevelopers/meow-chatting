@@ -1,10 +1,10 @@
-package com.meow.meowchatting.auth.command.enums;
+package com.meow.meowchatting.s3.enums;
 
 import lombok.Getter;
 
 @Getter
 public enum S3Bucket {
-    UserProfileBucket("user_profile_bucket", "user-profile/");
+    UserProfileBucket("user-profile-bucket", "user-profile/");
 
     private final String bucketName;
     private final String s3Path;
