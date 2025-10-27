@@ -34,7 +34,7 @@ class WebSecurityConfig(
             .cors { } // CorsConfigurationSource Bean 참조 및 CORS 활성화
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/v1/oauth/**").permitAll()
+                it.requestMatchers("/api/v1/oauth/**", "/api/v1/user/profile").permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)

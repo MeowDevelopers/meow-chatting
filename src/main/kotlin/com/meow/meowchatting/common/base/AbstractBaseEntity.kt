@@ -9,17 +9,17 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class AbstractBaseEntity {
+open class AbstractBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id : Long? = null
+    open var id : Long? = null
 
     @CreatedDate
     @Column(updatable = false)
-    var createdAt : LocalDateTime?= null
+    open var createdAt : LocalDateTime?= null
 
     @LastModifiedDate
-    var modifiedAt : LocalDateTime?= null
+    open var modifiedAt : LocalDateTime?= null
 
 }

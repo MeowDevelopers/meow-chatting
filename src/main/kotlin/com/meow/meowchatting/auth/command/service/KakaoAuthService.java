@@ -1,14 +1,5 @@
 package com.meow.meowchatting.auth.command.service;
 
-import java.util.stream.Stream;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.ObjectUtils;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.meow.meowchatting.auth.command.client.KakaoApiClient;
 import com.meow.meowchatting.auth.command.client.KakaoOauthConfig;
 import com.meow.meowchatting.auth.command.dto.KakaoLoginResponseDto;
@@ -18,6 +9,8 @@ import com.meow.meowchatting.auth.command.enums.AuthResponseCode;
 import com.meow.meowchatting.auth.command.exception.AuthException;
 import com.meow.meowchatting.common.response.DataResponse;
 import com.meow.meowchatting.jwt.JwtProvider;
+import com.meow.meowchatting.s3.enums.S3Bucket;
+import com.meow.meowchatting.s3.service.S3Service;
 import com.meow.meowchatting.user.command.domain.RefreshToken;
 import com.meow.meowchatting.user.command.domain.User;
 import com.meow.meowchatting.user.command.domain.UserProfile;
@@ -25,7 +18,17 @@ import com.meow.meowchatting.user.command.enums.UserType;
 import com.meow.meowchatting.user.repository.RefreshTokenRepository;
 import com.meow.meowchatting.user.repository.UserCommandRepository;
 import com.meow.meowchatting.user.repository.UserProfileRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import java.util.stream.Stream;
 
+@Slf4j
 @Service
 public class KakaoAuthService {
 
@@ -35,16 +38,20 @@ public class KakaoAuthService {
     private final UserProfileRepository userProfileRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
+    private final S3Service s3Service;
+    private final WebClient webClient;
 
     public KakaoAuthService(KakaoOauthConfig kakaoOauthConfig, KakaoApiClient kakaoApiClient,
                             UserCommandRepository userCommandRepository, UserProfileRepository userProfileRepository,
-                            RefreshTokenRepository refreshTokenRepository, JwtProvider jwtProvider) {
+                            RefreshTokenRepository refreshTokenRepository, JwtProvider jwtProvider, S3Service s3Service, WebClient webClient) {
         this.kakaoOauthConfig = kakaoOauthConfig;
         this.kakaoApiClient = kakaoApiClient;
         this.userCommandRepository = userCommandRepository;
         this.userProfileRepository = userProfileRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwtProvider = jwtProvider;
+        this.s3Service = s3Service;
+        this.webClient = webClient;
     }
 
     private void validateOauthConfig(){
@@ -84,6 +91,8 @@ public class KakaoAuthService {
         UserProfile userProfile = userProfileRepository.findByUserId(user.getId())
                 .orElseGet(() -> userProfileRepository.save(kakaoUser.toUserProfileEntity(user.getId())));
 
+        uploadUserProfile(user, userProfile, kakaoUser);
+
         String accessToken = jwtProvider.generateAccessToken(user.getId(), UserType.ROLE_USER);
         String refreshToken = jwtProvider.generateRefreshToken(user.getId(), UserType.ROLE_USER);
 
@@ -106,5 +115,23 @@ public class KakaoAuthService {
         params.add("code", authCode);
         params.add("client_secret", kakaoOauthConfig.getClientSecret());
         return params;
+    }
+
+    private void uploadUserProfile(User user, UserProfile userProfile, KakaoUserResponse kakaoUser) {
+        String currentUrl = userProfile.getUserProfileUrl();
+        if (!currentUrl.startsWith("user-profile/")) {
+            byte[] imageBytes = webClient.get()
+                    .uri(kakaoUser.kakaoAccount().profile().profileImageUrl())
+                    .retrieve()
+                    .bodyToMono(byte[].class)
+                    .block();
+
+            String key = "user-profile/" + user.getId() + ".jpg";
+            s3Service.uploadFile(S3Bucket.UserProfileBucket, key, imageBytes, "image/jpeg");
+
+            userProfile.setUserProfileUrl(key);
+            userProfileRepository.save(userProfile);
+        }
+
     }
 }

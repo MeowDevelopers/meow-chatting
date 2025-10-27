@@ -9,11 +9,11 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class AbstractBaseUserByEntity : AbstractBaseEntity(){
+open class AbstractBaseUserByEntity : AbstractBaseEntity(){
 
     @Column(name = "deleted_at", nullable = true)
-    var deletedAt : LocalDateTime?= null
-    fun markDeleted() {
+    open var deletedAt : LocalDateTime?= null
+    open fun markDeleted() {
         this.deletedAt = LocalDateTime.now()
     }
 }
