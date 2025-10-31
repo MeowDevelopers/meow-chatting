@@ -74,22 +74,20 @@ public class WebSocketSessionManager {
 	 * 채팅방 구독 해제
 	 */
 	public void unsubscribeRoom(Long userId, Long roomId) {
-		Set<Long> userRooms = userSubscriptions.get(userId);
-		if (userRooms != null) {
-			userRooms.remove(roomId);
-			if (userRooms.isEmpty()) {
-				userSubscriptions.remove(userId);
-			}
-		}
+		removeMapping(userSubscriptions, userId, roomId);
+		removeMapping(roomSubscribers, roomId, userId);
 
-		Set<Long> roomUsers = roomSubscribers.get(roomId);
-		if (roomUsers != null) {
-			roomUsers.remove(userId);
-			if (roomUsers.isEmpty()) {
-				roomSubscribers.remove(roomId);
+		log.debug("채팅방 구독 해제 : userId={}, roomId={}", userId, roomId);
+	}
+
+	private <K, V> void removeMapping(Map<K, Set<V>> map, K key, V value) {
+		Set<V> set = map.get(key);
+		if (set != null) {
+			set.remove(value);
+			if (set.isEmpty()) {
+				map.remove(key);
 			}
 		}
-		log.debug("채팅방 구독 해제 : userId={}, roomId={}", userId, roomId);
 	}
 
 	/**
