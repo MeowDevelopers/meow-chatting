@@ -81,13 +81,10 @@ public class WebSocketSessionManager {
 	}
 
 	private <K, V> void removeMapping(Map<K, Set<V>> map, K key, V value) {
-		Set<V> set = map.get(key);
-		if (set != null) {
+		map.computeIfPresent(key, (k, set) -> {
 			set.remove(value);
-			if (set.isEmpty()) {
-				map.remove(key);
-			}
-		}
+			return set.isEmpty() ? null : set;
+		});
 	}
 
 	/**
