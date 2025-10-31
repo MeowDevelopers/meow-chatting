@@ -36,24 +36,22 @@ public class WebSocketSessionManager {
 	 * 세션 제거
 	 */
 	public void removeSession(Long userId) {
-		WebSocketSession removed = userSessions.remove(userId);
-		if (removed != null) {
+		if (userSessions.remove(userId) != null) {
 			log.debug("세션 제거 : userId={}", userId);
 		}
 
-		// 구독 정보도 모두 제거
+		// 구독 정보 제거
 		Set<Long> subscribedRooms = userSubscriptions.remove(userId);
-		if (subscribedRooms != null) {
-			for (Long roomId : subscribedRooms) {
-				Set<Long> subscribers = roomSubscribers.get(roomId);
-				if (subscribers != null) {
-					subscribers.remove(userId);
-					if (subscribers.isEmpty()) {
-						roomSubscribers.remove(roomId);
-					}
-				}
-			}
+		if (subscribedRooms == null || subscribedRooms.isEmpty()) {
+			return;
 		}
+
+		// 각 방에서 해당 유저 제거 + 비어 있으면 방 자체 삭제
+		subscribedRooms.forEach(roomId -> roomSubscribers.computeIfPresent(roomId, (id, subscribers) -> {
+				subscribers.remove(userId);
+				return subscribers.isEmpty() ? null : subscribers;
+			})
+		);
 	}
 
 	/**
